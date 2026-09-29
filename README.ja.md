@@ -94,10 +94,29 @@ MediaWiki 1.45 以降が必要です。動作確認は 1.46 + MariaDB で行っ�
 | `$wgFootprintsCooldown` | `300` | この秒数以内の再訪は閲覧回数に数えない（`0` で毎回数える） |
 | `$wgFootprintsListLimit` | `200` | Special:Footprints と API で返す最大行数 |
 | `$wgFootprintsDialogStyle` | `'simple'` | `'simple'` か `'rich'` |
-| `$wgFootprintsDialogWebFonts` | `false` | rich ダイアログのみ：表示用フォントを Google Fonts から読み込む |
+| `$wgFootprintsDialogFontFamily` | `null` | rich ダイアログのみ：本文の CSS `font-family`（`null` ならスキンのフォント） |
+| `$wgFootprintsDialogNumberFontFamily` | `null` | rich ダイアログのみ：人数・日付の CSS `font-family`（`null` なら本文と同じ） |
+| `$wgFootprintsDialogFontStylesheets` | `[]` | rich ダイアログのみ：初めて開いたときに読み込むスタイルシートの URL |
 | `$wgFootprintsRegularViews` | `15` | rich ダイアログの「常連」バッジに必要な閲覧回数 |
 | `$wgFootprintsNotifyEnabled` | `true` | 節目の通知を送る（Echo が必要） |
 | `$wgFootprintsNotifyMilestones` | `[ 1, 3, 5, 10, 20, 50, 100 ]` | 通知を送る人数（作成者を除く） |
+
+rich ダイアログに Web フォントを使う例（Google Fonts の場合）：
+
+```php
+$wgFootprintsDialogStyle = 'rich';
+$wgFootprintsDialogFontFamily = "'Zen Kaku Gothic New', sans-serif";
+$wgFootprintsDialogNumberFontFamily = "'M PLUS 1 Code', monospace";
+$wgFootprintsDialogFontStylesheets = [
+	'https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&display=swap',
+	'https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@400;500&display=swap',
+];
+```
+
+ここに書かない限り、Wiki の外から何かを読み込むことはありません。Google Fonts から
+読み込むと、ダイアログを開いた読者のアクセスが Google に送られます。Cloudflare の
+「Rewrite to Cloudflare Fonts」を有効にしている場合は、URL を1ファミリーずつに
+分けてください。複数ファミリーをまとめた URL は、最初の1つしか残りません。
 
 Special:Footprints と API は、`read` 権限があれば誰でも使えます。特定のグループに
 限りたい場合は、`SpecialFootprints::execute()` と `ApiQueryFootprints::execute()` に

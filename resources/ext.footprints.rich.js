@@ -385,41 +385,27 @@
 
 	var fontsRequested = false;
 
-	// Off by default: it sends every reader who opens the dialog to Google.
-	// Loaded lazily, only once the dialog is actually opened -- nothing else
-	// on the page needs these two faces.
-	//
-	// ★ One family per <link>. Cloudflare's "Rewrite to Cloudflare Fonts"
-	//   inlines Google Fonts <link> tags as @font-face, and when a single
-	//   URL bundles more than one family, only the first survives that
-	//   rewrite; the rest disappear with no error.
-	function ensureFonts() {
-		if ( !config.FootprintsDialogWebFonts ) {
-			return false;
-		}
+	// Loaded only once the dialog is actually opened: nothing else on the
+	// page needs these faces.
+	function loadFontStylesheets() {
 		if ( fontsRequested ) {
-			return true;
+			return;
 		}
 		fontsRequested = true;
+		( config.FootprintsDialogFontStylesheets || [] ).forEach( function ( href ) {
+			document.head.appendChild( $( '<link>' ).attr( { rel: 'stylesheet', href: href } )[ 0 ] );
+		} );
+	}
 
-		var head = document.head;
-		[ 'https://fonts.googleapis.com', 'https://fonts.gstatic.com' ].forEach( function ( origin ) {
-			var $preconnect = $( '<link>' ).attr( { rel: 'preconnect', href: origin } );
-			if ( origin.indexOf( 'gstatic' ) !== -1 ) {
-				$preconnect[ 0 ].crossOrigin = 'anonymous';
-			}
-			head.appendChild( $preconnect[ 0 ] );
-		} );
-		[
-			'Zen+Kaku+Gothic+New:wght@500;700',
-			'M+PLUS+1+Code:wght@400;500'
-		].forEach( function ( family ) {
-			head.appendChild( $( '<link>' ).attr( {
-				rel: 'stylesheet',
-				href: 'https://fonts.googleapis.com/css2?family=' + family + '&display=swap'
-			} )[ 0 ] );
-		} );
-		return true;
+	// Custom properties rather than inline font-family, so the stylesheet
+	// decides which elements get the number face.
+	function applyFonts( overlay ) {
+		if ( config.FootprintsDialogFontFamily ) {
+			overlay.style.setProperty( '--ef-font-text', config.FootprintsDialogFontFamily );
+		}
+		if ( config.FootprintsDialogNumberFontFamily ) {
+			overlay.style.setProperty( '--ef-font-numbers', config.FootprintsDialogNumberFontFamily );
+		}
 	}
 
 	// Cached by page name so a hover/focus that already warmed the request
@@ -452,9 +438,10 @@
 	// the wait is shown rather than left as a silent delay before the click.
 	function openDialog( href, promise ) {
 		var closed = false;
-		var $overlay = $( '<div>' )
-			.addClass( 'ext-footprints-overlay' )
-			.toggleClass( 'ext-footprints-webfonts', ensureFonts() );
+		loadFontStylesheets();
+
+		var $overlay = $( '<div>' ).addClass( 'ext-footprints-overlay' );
+		applyFonts( $overlay[ 0 ] );
 		var $dialog = $( '<div>' )
 			.addClass( 'ext-footprints-dialog' )
 			.attr( { role: 'dialog', 'aria-modal': 'true', 'aria-label': mw.msg( 'footprints-page-title', mw.config.get( 'wgTitle' ) ) } );

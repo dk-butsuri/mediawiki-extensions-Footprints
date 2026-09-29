@@ -1,6 +1,6 @@
 {
 	"name": "Footprints",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"author": [
 		"dk-butsuri"
 	],
@@ -109,7 +109,9 @@
 				{
 					"name": "config.json",
 					"config": [
-						"FootprintsDialogWebFonts"
+						"FootprintsDialogFontFamily",
+						"FootprintsDialogNumberFontFamily",
+						"FootprintsDialogFontStylesheets"
 					]
 				}
 			],
@@ -177,9 +179,18 @@
 			"description": "What clicking the indicator opens. \"simple\": a plain table of readers in an OOUI dialog. \"rich\": a styled card with a read-since-last-edit bar, a 14-day chart, sort tabs and badges.",
 			"value": "simple"
 		},
-		"FootprintsDialogWebFonts": {
-			"description": "Rich dialog only: load its two display fonts from Google Fonts when it opens. Off by default, since it sends each reader who opens the dialog to Google.",
-			"value": false
+		"FootprintsDialogFontFamily": {
+			"description": "Rich dialog only: CSS font-family for the dialog's text, e.g. \"'Noto Sans JP', sans-serif\". null keeps the skin's font.",
+			"value": null
+		},
+		"FootprintsDialogNumberFontFamily": {
+			"description": "Rich dialog only: CSS font-family for the counts and dates. null uses the dialog's text font.",
+			"value": null
+		},
+		"FootprintsDialogFontStylesheets": {
+			"description": "Rich dialog only: stylesheet URLs (e.g. Google Fonts) loaded the first time the dialog opens, for the fonts named above. Empty loads nothing from anywhere.",
+			"value": [],
+			"merge_strategy": "provide_default"
 		},
 		"FootprintsRegularViews": {
 			"description": "fp_views a (page, user) row needs to earn the dialog's \"regular\" badge.",

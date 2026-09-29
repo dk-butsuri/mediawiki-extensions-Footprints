@@ -97,10 +97,29 @@ their preferences.
 | `$wgFootprintsCooldown` | `300` | Seconds within which a repeat view is not counted again (`0` counts every view) |
 | `$wgFootprintsListLimit` | `200` | Maximum rows on Special:Footprints and in the API |
 | `$wgFootprintsDialogStyle` | `'simple'` | `'simple'` or `'rich'` |
-| `$wgFootprintsDialogWebFonts` | `false` | Rich dialog only: load its display fonts from Google Fonts |
+| `$wgFootprintsDialogFontFamily` | `null` | Rich dialog only: CSS `font-family` for its text (`null`: the skin's font) |
+| `$wgFootprintsDialogNumberFontFamily` | `null` | Rich dialog only: CSS `font-family` for counts and dates (`null`: same as the text) |
+| `$wgFootprintsDialogFontStylesheets` | `[]` | Rich dialog only: stylesheet URLs to load when it first opens |
 | `$wgFootprintsRegularViews` | `15` | Views needed for the "regular" badge in the rich dialog |
 | `$wgFootprintsNotifyEnabled` | `true` | Send milestone notifications (needs Echo) |
 | `$wgFootprintsNotifyMilestones` | `[ 1, 3, 5, 10, 20, 50, 100 ]` | Reader counts (excluding the creator) that trigger a notification |
+
+Web fonts for the rich dialog, for example from Google Fonts:
+
+```php
+$wgFootprintsDialogStyle = 'rich';
+$wgFootprintsDialogFontFamily = "'Zen Kaku Gothic New', sans-serif";
+$wgFootprintsDialogNumberFontFamily = "'M PLUS 1 Code', monospace";
+$wgFootprintsDialogFontStylesheets = [
+	'https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&display=swap',
+	'https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@400;500&display=swap',
+];
+```
+
+Nothing is loaded from outside the wiki unless you list it here; loading from
+Google Fonts sends each reader who opens the dialog to Google. Use one URL per
+family if your site is behind Cloudflare with "Rewrite to Cloudflare Fonts" on:
+that rewrite keeps only the first family of a multi-family URL.
 
 Special:Footprints and the API are open to anyone with the `read` right. To
 limit them to some group, add a check in `SpecialFootprints::execute()` and

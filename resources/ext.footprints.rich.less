@@ -77,9 +77,9 @@ html.skin-theme-clientpref-night .ext-footprints-overlay {
 	}
 }
 
-// The two web font families apply only under .ext-footprints-webfonts, which
-// the script puts on the overlay when $wgFootprintsDialogWebFonts is on and
-// it has requested them. Otherwise the dialog keeps the skin's own font.
+// --ef-font-text / --ef-font-numbers are set on the overlay from
+// $wgFootprintsDialogFontFamily / $wgFootprintsDialogNumberFontFamily. Unset,
+// var() makes font-family fall back to inherit, i.e. the skin's own font.
 .ext-footprints-dialog {
 	display: flex;
 	flex-direction: column;
@@ -95,18 +95,12 @@ html.skin-theme-clientpref-night .ext-footprints-overlay {
 	border-radius: 10px;
 	box-shadow: 0 4px 16px rgba( 0, 0, 0, 0.3 );
 	overflow: hidden;
-
-	.ext-footprints-webfonts & {
-		font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
-	}
+	font-family: var( --ef-font-text );
 }
 
 .ext-footprints-num {
 	font-variant-numeric: tabular-nums;
-
-	.ext-footprints-webfonts & {
-		font-family: 'M PLUS 1 Code', monospace;
-	}
+	font-family: var( --ef-font-numbers );
 	// A monospace face runs narrower at the same font-size as the gothic
 	// body text around it; nudging the size up keeps digits from reading
 	// smaller than the prose they are embedded in.
@@ -211,10 +205,7 @@ html.skin-theme-clientpref-night .ext-footprints-overlay {
 	font-size: 0.8em;
 	color: @ef-color-subtle;
 	font-variant-numeric: tabular-nums;
-
-	.ext-footprints-webfonts & {
-		font-family: 'M PLUS 1 Code', monospace;
-	}
+	font-family: var( --ef-font-numbers );
 }
 
 // The numerator is the number worth noticing; the denominator is just
@@ -282,20 +273,14 @@ html.skin-theme-clientpref-night .ext-footprints-overlay {
 	justify-content: space-between;
 	margin-top: 6px;
 	font-variant-numeric: tabular-nums;
-
-	.ext-footprints-webfonts & {
-		font-family: 'M PLUS 1 Code', monospace;
-	}
+	font-family: var( --ef-font-numbers );
 	font-size: 0.66em;
 	color: @ef-color-subtle;
 }
 
 .ext-footprints-chart-today-num {
 	font-variant-numeric: tabular-nums;
-
-	.ext-footprints-webfonts & {
-		font-family: 'M PLUS 1 Code', monospace;
-	}
+	font-family: var( --ef-font-numbers );
 	color: @ef-color-progressive;
 }
 
@@ -462,10 +447,7 @@ html.skin-theme-clientpref-night .ext-footprints-overlay {
 	font-size: 0.72em;
 	color: @ef-color-subtle;
 	font-variant-numeric: tabular-nums;
-
-	.ext-footprints-webfonts & {
-		font-family: 'M PLUS 1 Code', monospace;
-	}
+	font-family: var( --ef-font-numbers );
 }
 
 .ext-footprints-row-time {
@@ -474,10 +456,7 @@ html.skin-theme-clientpref-night .ext-footprints-overlay {
 	color: @ef-color-subtle;
 	white-space: nowrap;
 	font-variant-numeric: tabular-nums;
-
-	.ext-footprints-webfonts & {
-		font-family: 'M PLUS 1 Code', monospace;
-	}
+	font-family: var( --ef-font-numbers );
 }
 
 .ext-footprints-viewall {
