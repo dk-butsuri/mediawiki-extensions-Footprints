@@ -1,5 +1,7 @@
 # Footprints
 
+**English** | [日本語](README.ja.md)
+
 A MediaWiki extension that puts a footprint icon and a number next to each
 page title. The number is how many **different people** have read the page.
 Clicking it shows **who** they were and when they last came by.
