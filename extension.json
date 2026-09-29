@@ -1,0 +1,206 @@
+{
+	"name": "Footprints",
+	"version": "1.0.0",
+	"author": [
+		"dk-butsuri"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:Footprints",
+	"descriptionmsg": "footprints-desc",
+	"license-name": "GPL-2.0-or-later",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.45"
+	},
+	"MessagesDirs": {
+		"Footprints": [
+			"i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"FootprintsAlias": "Footprints.alias.php"
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\Footprints\\": "includes/"
+	},
+	"ServiceWiringFiles": [
+		"includes/ServiceWiring.php"
+	],
+	"SpecialPages": {
+		"Footprints": {
+			"class": "MediaWiki\\Extension\\Footprints\\SpecialFootprints",
+			"services": [
+				"Footprints.FootprintStore",
+				"TitleFactory",
+				"UserLinkRenderer",
+				"LinkRenderer",
+				"MainConfig"
+			]
+		}
+	},
+	"APIListModules": {
+		"footprints": {
+			"class": "MediaWiki\\Extension\\Footprints\\ApiQueryFootprints",
+			"services": [
+				"Footprints.FootprintStore",
+				"TitleFactory",
+				"MainConfig",
+				"RevisionStore"
+			]
+		}
+	},
+	"Hooks": {
+		"BeforePageDisplay": "main",
+		"PageDeleteComplete": "main",
+		"LoadExtensionSchemaUpdates": "schema",
+		"BeforeCreateEchoEvent": "echo"
+	},
+	"HookHandlers": {
+		"main": {
+			"class": "MediaWiki\\Extension\\Footprints\\Hooks",
+			"services": [
+				"MainConfig",
+				"Footprints.FootprintStore",
+				"UserGroupManager",
+				"ReadOnlyMode",
+				"RevisionStore",
+				"HookContainer"
+			]
+		},
+		"schema": {
+			"class": "MediaWiki\\Extension\\Footprints\\SchemaHooks"
+		},
+		"echo": {
+			"class": "MediaWiki\\Extension\\Footprints\\EchoHooks"
+		}
+	},
+	"DefaultUserOptions": {
+		"echo-subscriptions-web-footprints": true,
+		"echo-subscriptions-email-footprints": false
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "resources",
+		"remoteExtPath": "Footprints/resources"
+	},
+	"ResourceModules": {
+		"ext.footprints.styles": {
+			"styles": "ext.footprints.less"
+		},
+		"ext.footprints.simple": {
+			"packageFiles": [
+				"ext.footprints.simple.js"
+			],
+			"dependencies": [
+				"mediawiki.util",
+				"mediawiki.language"
+			],
+			"messages": [
+				"footprints-page-title",
+				"footprints-readercount",
+				"footprints-empty",
+				"footprints-viewall",
+				"footprints-header-user",
+				"footprints-header-last",
+				"footprints-header-views"
+			]
+		},
+		"ext.footprints.rich": {
+			"packageFiles": [
+				"ext.footprints.rich.js",
+				{
+					"name": "config.json",
+					"config": [
+						"FootprintsDialogWebFonts"
+					]
+				}
+			],
+			"styles": [
+				"ext.footprints.rich.less"
+			],
+			"dependencies": [
+				"mediawiki.util",
+				"mediawiki.language"
+			],
+			"messages": [
+				"footprints-page-title",
+				"footprints-readercount",
+				"footprints-empty",
+				"footprints-viewall",
+				"footprints-header-user",
+				"footprints-header-last",
+				"footprints-header-views",
+				"footprints-dialog-subtitle",
+				"footprints-dialog-loading",
+				"footprints-dialog-updated-section",
+				"footprints-dialog-updated-line",
+				"footprints-dialog-updated-line-unknown-editor",
+				"footprints-dialog-chart-title",
+				"footprints-dialog-chart-days",
+				"footprints-dialog-chart-today",
+				"footprints-dialog-sort-recent",
+				"footprints-dialog-sort-frequent",
+				"footprints-dialog-sort-unread",
+				"footprints-dialog-badge-you",
+				"footprints-dialog-badge-owner",
+				"footprints-dialog-badge-last-editor",
+				"footprints-dialog-badge-regular",
+				"footprints-dialog-close",
+				"footprints-dialog-viewall",
+				"footprints-relative-now",
+				"footprints-relative-minutes",
+				"footprints-relative-hours",
+				"footprints-relative-days"
+			]
+		}
+	},
+	"config": {
+		"FootprintsNamespaces": {
+			"description": "Namespaces in which footprints are recorded and the indicator is shown.",
+			"value": [
+				0
+			]
+		},
+		"FootprintsExcludeGroups": {
+			"description": "Users in any of these groups do not leave footprints.",
+			"value": [
+				"bot"
+			]
+		},
+		"FootprintsCooldown": {
+			"description": "Seconds after a counted view during which further views of the same page by the same user are not counted again. 0 counts every view.",
+			"value": 300
+		},
+		"FootprintsListLimit": {
+			"description": "Maximum number of rows shown on Special:Footprints.",
+			"value": 200
+		},
+		"FootprintsDialogStyle": {
+			"description": "What clicking the indicator opens. \"simple\": a plain table of readers in an OOUI dialog. \"rich\": a styled card with a read-since-last-edit bar, a 14-day chart, sort tabs and badges.",
+			"value": "simple"
+		},
+		"FootprintsDialogWebFonts": {
+			"description": "Rich dialog only: load its two display fonts from Google Fonts when it opens. Off by default, since it sends each reader who opens the dialog to Google.",
+			"value": false
+		},
+		"FootprintsRegularViews": {
+			"description": "fp_views a (page, user) row needs to earn the dialog's \"regular\" badge.",
+			"value": 15
+		},
+		"FootprintsNotifyEnabled": {
+			"description": "Send the page creator an Echo notification when their page reaches a reader milestone. Needs the Echo extension; without it this does nothing.",
+			"value": true
+		},
+		"FootprintsNotifyMilestones": {
+			"description": "Reader counts that produce a notification. Counted excluding the page creator, so 1 means the first person other than the author to read it. An empty list turns the notification off as surely as FootprintsNotifyEnabled false.",
+			"value": [
+				1,
+				3,
+				5,
+				10,
+				20,
+				50,
+				100
+			]
+		}
+	},
+	"manifest_version": 2
+}

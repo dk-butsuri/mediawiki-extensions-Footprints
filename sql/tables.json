@@ -1,0 +1,98 @@
+[
+	{
+		"name": "footprint",
+		"comment": "One row per (page, user) pair. COUNT(*) per page is the number of unique viewers.",
+		"columns": [
+			{
+				"name": "fp_page",
+				"comment": "page.page_id of the viewed page",
+				"type": "integer",
+				"options": { "unsigned": true, "notnull": true }
+			},
+			{
+				"name": "fp_user",
+				"comment": "user.user_id of the viewer. Stored as an id so renames follow automatically.",
+				"type": "integer",
+				"options": { "unsigned": true, "notnull": true }
+			},
+			{
+				"name": "fp_views",
+				"comment": "Total number of views by this user on this page",
+				"type": "integer",
+				"options": { "unsigned": true, "notnull": true, "default": 1 }
+			},
+			{
+				"name": "fp_first",
+				"comment": "Timestamp of the first view",
+				"type": "mwtimestamp",
+				"options": { "notnull": true }
+			},
+			{
+				"name": "fp_last",
+				"comment": "Timestamp of the most recent view",
+				"type": "mwtimestamp",
+				"options": { "notnull": true }
+			}
+		],
+		"indexes": [
+			{
+				"name": "fp_page_last",
+				"comment": "List the viewers of one page, most recent first",
+				"columns": [ "fp_page", "fp_last" ],
+				"unique": false
+			},
+			{
+				"name": "fp_user_last",
+				"comment": "List the pages one user has visited, most recent first",
+				"columns": [ "fp_user", "fp_last" ],
+				"unique": false
+			}
+		],
+		"pk": [ "fp_page", "fp_user" ]
+	},
+	{
+		"name": "footprint_log",
+		"comment": "One row per counted view (same cooldown rule as footprint.fp_views). Append-only; feeds per-hour/per-day activity aggregates that a single last-seen row per (page, user) cannot answer.",
+		"columns": [
+			{
+				"name": "fl_id",
+				"comment": "Surrogate key, no meaning beyond insertion order",
+				"type": "integer",
+				"options": { "unsigned": true, "notnull": true, "autoincrement": true }
+			},
+			{
+				"name": "fl_page",
+				"comment": "page.page_id of the viewed page",
+				"type": "integer",
+				"options": { "unsigned": true, "notnull": true }
+			},
+			{
+				"name": "fl_user",
+				"comment": "user.user_id of the viewer",
+				"type": "integer",
+				"options": { "unsigned": true, "notnull": true }
+			},
+			{
+				"name": "fl_timestamp",
+				"comment": "When this view was counted",
+				"type": "mwtimestamp",
+				"options": { "notnull": true }
+			}
+		],
+		"indexes": [
+			{
+				"name": "fl_timestamp",
+				"comment": "Site-wide activity feed and heatmap, most recent first",
+				"columns": [ "fl_timestamp" ],
+				"unique": false
+			},
+			{
+				"name": "fl_page_timestamp",
+				"comment": "One page's view history",
+				"columns": [ "fl_page", "fl_timestamp" ],
+				"unique": false
+			}
+		],
+		"pk": [ "fl_id" ]
+	}
+]

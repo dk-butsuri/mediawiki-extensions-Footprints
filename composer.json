@@ -1,0 +1,12 @@
+{
+	"name": "dk-butsuri/footprints",
+	"type": "mediawiki-extension",
+	"description": "MediaWiki extension that shows how many different people have read each page, and who they were",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"composer/installers": ">=1.0.1"
+	},
+	"extra": {
+		"installer-name": "Footprints"
+	}
+}

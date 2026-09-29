@@ -1,0 +1,54 @@
+@import 'mediawiki.skin.variables.less';
+@import 'footprints.variables.less';
+
+.ext-footprints-indicator {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25em;
+	color: @ef-color-subtle;
+	white-space: nowrap;
+	text-decoration: none;
+
+	&:hover,
+	&:focus {
+		color: @ef-color-progressive;
+		text-decoration: none;
+	}
+}
+
+// Drawn as a mask filled with the link colour, so it follows hover and dark
+// mode without shipping a second copy of the icon.
+.ext-footprints-icon {
+	display: inline-block;
+	width: 1.15em;
+	height: 1.15em;
+	background-color: currentColor;
+	-webkit-mask-image: /* @embed */ url( footprints.svg );
+	mask-image: /* @embed */ url( footprints.svg );
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+}
+
+.ext-footprints-count {
+	font-weight: @font-weight-bold;
+	line-height: 1;
+}
+
+// Anything added through the FootprintsIndicator hook sits to the left of
+// the link, inside this.
+.ext-footprints-group {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6em;
+}
+
+.ext-footprints-table {
+	td,
+	th {
+		white-space: nowrap;
+	}
+}

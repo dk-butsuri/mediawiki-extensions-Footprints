@@ -1,0 +1,26 @@
+// mediawiki.skin.variables.less's @-variables (used below only for
+// non-colour values like @font-weight-bold) compile to flat literals at
+// build time, so they stay whatever "light" was at build time. Colour
+// instead goes through the CSS custom properties Vector's own
+// CSSCustomProperties.less keeps on :root and swaps live for
+// html.skin-theme-clientpref-night / -os -- the same properties, same
+// names, just referenced with var() and a light fallback instead of a
+// LESS @-variable. That is what makes every colour below track the
+// reader's own light/dark choice instead of being stuck on whichever
+// theme happened to be active when the CSS was compiled.
+@ef-color-subtle: var( --color-subtle, #555 );
+@ef-color-emphasized: var( --color-emphasized, #101418 );
+@ef-color-progressive: var( --color-progressive, #0645ad );
+@ef-color-warning: var( --color-warning, #edab00 );
+@ef-background-base: var( --background-color-base, #fff );
+@ef-background-interactive-subtle: var( --background-color-interactive-subtle, #f9f9f9 );
+@ef-background-progressive-subtle: var( --background-color-progressive-subtle, #eaf3ff );
+@ef-background-progressive-subtle-hover: var( --background-color-progressive-subtle--hover, #d9e2ff );
+@ef-background-progressive-subtle-active: var( --background-color-progressive-subtle--active, #b6d4fb );
+@ef-background-progressive: var( --background-color-progressive, #0645ad );
+@ef-background-progressive-hover: var( --background-color-progressive--hover, #447ff5 );
+@ef-background-warning-subtle: var( --background-color-warning-subtle, #fef6e7 );
+@ef-background-neutral-subtle: var( --background-color-neutral-subtle, #f8f9fa );
+@ef-border-base: var( --border-color-base, #aaa );
+@ef-border-subtle: var( --border-color-subtle, #ccc );
+@ef-border-progressive: var( --border-color-progressive, #0645ad );

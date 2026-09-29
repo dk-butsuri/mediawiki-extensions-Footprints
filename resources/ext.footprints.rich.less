@@ -1,0 +1,559 @@
+@import 'mediawiki.skin.variables.less';
+@import 'footprints.variables.less';
+
+// A plain DOM overlay, not an OOUI window: nothing here needs more of OOUI
+// than a modal box, and hand-written markup keeps the sort tabs / chart /
+// badges in step with the skin's own colours (see footprints.variables.less).
+.ext-footprints-overlay {
+	position: fixed;
+	inset: 0;
+	// High, to clear the sticky bars and floating chat buttons skins and
+	// gadgets add: below 480px the sheet is bottom-anchored, and a bar left on
+	// top of it hides the footer, which holds the only close button.
+	z-index: 9500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+	background-color: rgba( 0, 0, 0, 0.5 );
+
+	// Light mode is happy with plain Codex tokens (see the @ef-* aliases in
+	// footprints.variables.less). Codex's *dark* tokens are a flat, fairly neutral gray though,
+	// and layered card surfaces read as muddy without some blue in them --
+	// so night mode gets its own tuned surface colours below instead of
+	// inheriting Codex's dark values directly.
+	--ef-surface: @ef-background-base;
+	--ef-surface-soft: @ef-background-interactive-subtle;
+	--ef-track: @ef-background-base;
+	--ef-tint-border: @ef-border-subtle;
+	--ef-chart-bar: @ef-background-progressive-subtle;
+	--ef-chart-bar-high: @ef-background-progressive-subtle-hover;
+	--ef-chart-bar-peak: @ef-background-progressive-subtle-active;
+	// A footer flush with the card body reads as one undifferentiated slab;
+	// the source design sinks it a shade darker so the OK button's row
+	// visually separates from the reader list above it.
+	--ef-footer: @ef-background-interactive-subtle;
+	--ef-accent-border: @ef-border-progressive;
+	--ef-accent-fill: @ef-background-progressive-subtle;
+	--ef-you-row: @ef-background-progressive-subtle;
+}
+
+// Unconditional under an explicit night choice, OS-gated under "auto" -- a
+// raw prefers-color-scheme query alone would desync from the page when a
+// reader has explicitly picked day mode but their OS is dark.
+html.skin-theme-clientpref-night .ext-footprints-overlay {
+	--ef-surface: #161c26;
+	--ef-surface-soft: #1b2330;
+	--ef-track: #101722;
+	--ef-tint-border: #2b3648;
+	// Codex's own --background-color-progressive-subtle (#1b223d) is only a
+	// couple of RGB steps from --ef-surface-soft above -- fine against
+	// Codex's neutral dark background, but it nearly vanished against this
+	// navy one, and 14 barely-contrasting rounded bars three pixels apart
+	// read as a single blurred mass rather than a chart. This needs to be
+	// visibly lighter than the card it sits on, not just "a blue".
+	--ef-chart-bar: #2c3849;
+	--ef-chart-bar-high: #35455c;
+	--ef-chart-bar-peak: #3e5273;
+	--ef-footer: #111823;
+	--ef-accent-border: #3c6bc4;
+	--ef-accent-fill: #1b2b45;
+	--ef-you-row: #16202f;
+}
+
+@media ( prefers-color-scheme: dark ) {
+	html.skin-theme-clientpref-os .ext-footprints-overlay {
+		--ef-surface: #161c26;
+		--ef-surface-soft: #1b2330;
+		--ef-track: #101722;
+		--ef-tint-border: #2b3648;
+		--ef-chart-bar: #2c3849;
+		--ef-chart-bar-high: #35455c;
+		--ef-chart-bar-peak: #3e5273;
+		--ef-footer: #111823;
+		--ef-accent-border: #3c6bc4;
+		--ef-accent-fill: #1b2b45;
+		--ef-you-row: #16202f;
+	}
+}
+
+// The two web font families apply only under .ext-footprints-webfonts, which
+// the script puts on the overlay when $wgFootprintsDialogWebFonts is on and
+// it has requested them. Otherwise the dialog keeps the skin's own font.
+.ext-footprints-dialog {
+	display: flex;
+	flex-direction: column;
+	// The design this follows was drawn on a 560px-wide board. Matching
+	// that width (rather than the 420px this started at) is what actually
+	// fixes the "looks cramped" complaint -- the type scale was already
+	// right, there just was not enough box around it.
+	width: 540px;
+	max-width: 100%;
+	max-height: 85vh;
+	background-color: var( --ef-surface );
+	border: 1px solid var( --ef-tint-border );
+	border-radius: 10px;
+	box-shadow: 0 4px 16px rgba( 0, 0, 0, 0.3 );
+	overflow: hidden;
+
+	.ext-footprints-webfonts & {
+		font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+	}
+}
+
+.ext-footprints-num {
+	font-variant-numeric: tabular-nums;
+
+	.ext-footprints-webfonts & {
+		font-family: 'M PLUS 1 Code', monospace;
+	}
+	// A monospace face runs narrower at the same font-size as the gothic
+	// body text around it; nudging the size up keeps digits from reading
+	// smaller than the prose they are embedded in.
+	font-size: 1.05em;
+	color: @ef-color-emphasized;
+}
+
+.ext-footprints-header {
+	flex: none;
+	padding: 18px 24px 14px;
+	text-align: center;
+	border-bottom: 1px solid var( --ef-tint-border );
+
+	// Resets Vector's bare `h2 { border-bottom; margin-bottom }` article-heading
+	// style, which applies to any h2 on the page (not just article content)
+	// and otherwise draws an unwanted underline between the title and the
+	// subtitle below it.
+	h2 {
+		margin: 0;
+		padding: 0;
+		font-size: 19px;
+		font-weight: @font-weight-bold;
+		color: @ef-color-emphasized;
+		border-bottom: 0;
+	}
+}
+
+.ext-footprints-subtitle {
+	margin: 5px 0 0;
+	font-size: 0.82em;
+	color: @ef-color-subtle;
+}
+
+.ext-footprints-body {
+	flex-grow: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 18px 24px 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.ext-footprints-body-loading {
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	min-height: 220px;
+}
+
+.ext-footprints-spinner {
+	width: 22px;
+	height: 22px;
+	border: 2px solid var( --ef-tint-border );
+	border-top-color: @ef-color-progressive;
+	border-radius: 50%;
+	animation: ext-footprints-spin 0.7s linear infinite;
+}
+
+@keyframes ext-footprints-spin {
+	to {
+		transform: rotate( 360deg );
+	}
+}
+
+.ext-footprints-loading-text {
+	margin: 0;
+	font-size: 0.82em;
+	color: @ef-color-subtle;
+}
+
+.ext-footprints-section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 14px 16px;
+	background-color: var( --ef-surface-soft );
+	border: 1px solid var( --ef-tint-border );
+	border-radius: 8px;
+}
+
+.ext-footprints-section-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+
+	// Same reset as the h2 above (padding-top/bottom this time, h3 gets no
+	// border from Vector) -- any bare hN on the page picks up Vector's
+	// article-heading spacing whether or not it is inside article content.
+	h3 {
+		margin: 0;
+		padding: 0;
+		font-size: 0.82em;
+		font-weight: @font-weight-bold;
+		color: @ef-color-emphasized;
+	}
+}
+
+.ext-footprints-section-fraction {
+	flex: none;
+	font-size: 0.8em;
+	color: @ef-color-subtle;
+	font-variant-numeric: tabular-nums;
+
+	.ext-footprints-webfonts & {
+		font-family: 'M PLUS 1 Code', monospace;
+	}
+}
+
+// The numerator is the number worth noticing; the denominator is just
+// context for it, so only the numerator gets the accent treatment.
+.ext-footprints-fraction-num {
+	font-size: 1.35em;
+	color: @ef-color-progressive;
+}
+
+.ext-footprints-section-note {
+	margin: 0;
+	font-size: 0.78em;
+	line-height: 1.6;
+	color: @ef-color-subtle;
+}
+
+.ext-footprints-emphasis {
+	color: @ef-color-emphasized;
+}
+
+.ext-footprints-warn {
+	color: @ef-color-warning;
+}
+
+.ext-footprints-progress {
+	height: 6px;
+	border-radius: 3px;
+	background-color: var( --ef-track );
+	overflow: hidden;
+}
+
+.ext-footprints-progress-fill {
+	height: 100%;
+	background-color: @ef-color-progressive;
+}
+
+.ext-footprints-chart {
+	display: flex;
+	align-items: flex-end;
+	gap: 3px;
+	height: 44px;
+}
+
+.ext-footprints-chart-bar {
+	flex-grow: 1;
+	min-height: 3px;
+	border-radius: 2px;
+	background-color: var( --ef-chart-bar );
+}
+
+.ext-footprints-chart-bar-high {
+	background-color: var( --ef-chart-bar-high );
+}
+
+.ext-footprints-chart-bar-peak {
+	background-color: var( --ef-chart-bar-peak );
+}
+
+.ext-footprints-chart-bar-today {
+	background-color: @ef-color-progressive;
+}
+
+.ext-footprints-chart-axis {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 6px;
+	font-variant-numeric: tabular-nums;
+
+	.ext-footprints-webfonts & {
+		font-family: 'M PLUS 1 Code', monospace;
+	}
+	font-size: 0.66em;
+	color: @ef-color-subtle;
+}
+
+.ext-footprints-chart-today-num {
+	font-variant-numeric: tabular-nums;
+
+	.ext-footprints-webfonts & {
+		font-family: 'M PLUS 1 Code', monospace;
+	}
+	color: @ef-color-progressive;
+}
+
+.ext-footprints-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.ext-footprints-tab {
+	height: 32px;
+	padding: 0 13px;
+	font: inherit;
+	font-size: 0.78em;
+	color: @ef-color-subtle;
+	background: transparent;
+	border: 1px solid var( --ef-tint-border );
+	border-radius: 6px;
+	cursor: pointer;
+
+	&:hover {
+		color: @ef-color-progressive;
+	}
+}
+
+.ext-footprints-tab-active {
+	color: @ef-color-progressive;
+	font-weight: @font-weight-bold;
+	background-color: var( --ef-accent-fill );
+	border-color: var( --ef-accent-border );
+}
+
+.ext-footprints-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.ext-footprints-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	// Resets Vector's bare `li { margin-bottom: 0.1em }`, which would
+	// otherwise stack on top of .ext-footprints-list's own flex gap.
+	margin: 0;
+	padding: 7px 10px;
+	// Both the plain and "you" rows carry a transparent border of the same
+	// width -- otherwise the highlighted row's real border shifts its
+	// content by a pixel against every row above and below it.
+	border: 1px solid transparent;
+	border-radius: 8px;
+}
+
+.ext-footprints-row-you {
+	background-color: var( --ef-you-row );
+	border-color: var( --ef-accent-border );
+}
+
+.ext-footprints-avatar {
+	flex: none;
+	width: 30px;
+	height: 30px;
+	display: grid;
+	place-items: center;
+	font-size: 13px;
+	font-weight: @font-weight-bold;
+	color: #fff;
+	border-radius: 50%;
+}
+
+.ext-footprints-row-body {
+	flex-grow: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.ext-footprints-row-top {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+}
+
+.ext-footprints-name {
+	flex-shrink: 1;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	font-size: 0.85em;
+	font-weight: @font-weight-bold;
+	color: inherit;
+
+	&:hover {
+		color: @ef-color-progressive;
+	}
+}
+
+.ext-footprints-badges {
+	flex: none;
+	display: flex;
+	gap: 4px;
+}
+
+.ext-footprints-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	padding: 1px 6px;
+	font-size: 0.68em;
+	white-space: nowrap;
+	border-radius: 3px;
+}
+
+// Solid, not tinted like the others: "you" is the one badge that needs to
+// register before anyone reads it, so it gets the loud treatment.
+.ext-footprints-badge-you {
+	font-weight: @font-weight-bold;
+	color: @ef-background-base;
+	background-color: @ef-color-progressive;
+}
+
+.ext-footprints-badge-owner,
+.ext-footprints-badge-editor {
+	color: @ef-color-warning;
+	background-color: @ef-background-warning-subtle;
+}
+
+.ext-footprints-badge-regular {
+	color: @ef-color-progressive;
+	background-color: @ef-background-progressive-subtle;
+}
+
+.ext-footprints-row-meta {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ext-footprints-row-bar {
+	flex: none;
+	width: 70px;
+	height: 3px;
+	border-radius: 2px;
+	background-color: var( --ef-track );
+	overflow: hidden;
+
+	span {
+		display: block;
+		height: 100%;
+		background-color: @ef-color-subtle;
+	}
+}
+
+.ext-footprints-row-views {
+	flex: none;
+	min-width: 2.6em;
+	text-align: right;
+	font-size: 0.72em;
+	color: @ef-color-subtle;
+	font-variant-numeric: tabular-nums;
+
+	.ext-footprints-webfonts & {
+		font-family: 'M PLUS 1 Code', monospace;
+	}
+}
+
+.ext-footprints-row-time {
+	flex: none;
+	font-size: 0.72em;
+	color: @ef-color-subtle;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+
+	.ext-footprints-webfonts & {
+		font-family: 'M PLUS 1 Code', monospace;
+	}
+}
+
+.ext-footprints-viewall {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 38px;
+	padding: 8px;
+	font-size: 0.8em;
+	color: @ef-color-subtle;
+	text-decoration: none;
+	border: 1px solid var( --ef-tint-border );
+	border-radius: 8px;
+
+	&:hover {
+		color: @ef-color-progressive;
+		border-color: @ef-border-progressive;
+		text-decoration: none;
+	}
+}
+
+.ext-footprints-footer {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 10px 20px;
+	background-color: var( --ef-footer );
+	border-top: 1px solid var( --ef-tint-border );
+}
+
+.ext-footprints-footer-link {
+	padding: 0 8px;
+	font-size: 0.8em;
+}
+
+.ext-footprints-close {
+	// Stays on the right when nothing has been added to the footer's left.
+	margin-left: auto;
+	min-width: 84px;
+	height: 34px;
+	padding: 0 18px;
+	font: inherit;
+	font-weight: @font-weight-bold;
+	color: #fff;
+	background-color: @ef-background-progressive;
+	border: 1px solid @ef-border-progressive;
+	border-radius: 6px;
+	cursor: pointer;
+
+	&:hover {
+		background-color: @ef-background-progressive-hover;
+	}
+}
+
+// Below this, the overlay behaves like a bottom sheet instead of a centred
+// card -- closer to a native mobile dialog, and it keeps the fixed-width
+// desktop dialog from being squeezed into an unreadable column.
+@media ( max-width: 480px ) {
+	.ext-footprints-overlay {
+		align-items: flex-end;
+		padding: 0;
+	}
+
+	.ext-footprints-dialog {
+		width: 100%;
+		max-height: 88vh;
+		// vh is the URL-bar-hidden height on mobile Chrome/Safari, so with the
+		// bar showing the footer would sit below the visible area.
+		max-height: 88dvh;
+		border-radius: 14px 14px 0 0;
+	}
+
+	.ext-footprints-footer {
+		padding-bottom: ~'max( 10px, env( safe-area-inset-bottom ) )';
+	}
+}
