@@ -48,5 +48,12 @@
 	"apihelp-query+footprints-description": "ページを読んだ利用者の一覧を返す。",
 	"apihelp-query+footprints-param-page": "対象ページの題名。",
 	"apihelp-query+footprints-param-limit": "返す利用者数の上限。",
-	"apihelp-query+footprints-example-simple": "メインページを読んだ利用者を一覧表示する。"
+	"apihelp-query+footprints-example-simple": "メインページを読んだ利用者を一覧表示する。",
+	"apihelp-query+footprintcounts-description": "読者の情報を含めず、累計の閲覧人数と回数を返す。",
+	"apihelp-query+footprintcounts-param-page": "対象ページ。省略時は閲覧記録のあるページの一覧。",
+	"apihelp-query+footprintcounts-param-namespace": "ページ省略時の対象名前空間。",
+	"apihelp-query+footprintcounts-param-excludegroups": "現在これらのグループに所属する読者を集計から除く。",
+	"apihelp-query+footprintcounts-param-continue": "前の応答で返された継続用の値。",
+	"apihelp-query+footprintcounts-param-limit": "返すページ数の上限。",
+	"apihelp-query+footprintcounts-example-simple": "標準名前空間のページの累計閲覧数を取得する。"
 }

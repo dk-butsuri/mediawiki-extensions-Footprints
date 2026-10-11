@@ -48,5 +48,12 @@
 	"apihelp-query+footprints-description": "List the users who have read a page.",
 	"apihelp-query+footprints-param-page": "Title of the page to list readers for.",
 	"apihelp-query+footprints-param-limit": "Maximum number of readers to return.",
-	"apihelp-query+footprints-example-simple": "List the readers of the main page."
+	"apihelp-query+footprints-example-simple": "List the readers of the main page.",
+	"apihelp-query+footprintcounts-description": "Return cumulative reader and view counts without reader identities.",
+	"apihelp-query+footprintcounts-param-page": "Page title. Omit to list pages with recorded views.",
+	"apihelp-query+footprintcounts-param-namespace": "Namespace to list when page is omitted.",
+	"apihelp-query+footprintcounts-param-excludegroups": "Exclude readers currently in any of these user groups.",
+	"apihelp-query+footprintcounts-param-continue": "Continuation value from a previous response.",
+	"apihelp-query+footprintcounts-param-limit": "Maximum number of pages to return.",
+	"apihelp-query+footprintcounts-example-simple": "Get cumulative counts for pages in the main namespace."
 }

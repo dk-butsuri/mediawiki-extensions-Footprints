@@ -34,7 +34,25 @@ Footprints は、どの利用者がどのページをいつ読んだかを保存
   ページ名つきで開くと、そのページを読んだ全員の一覧です。
 - **Echo 通知**（Echo が入っている場合）：ページの読者が 1・3・5・10・20・50・100 人に
   達したとき、作成者に知らせます。
-- **API**：`action=query&list=footprints&fppage=<ページ名>`
+- **API**：読者一覧は `action=query&list=footprints&fppage=<ページ名>`、
+  読者の情報を含まない集計は `action=query&list=footprintcounts`。
+
+## 人数・回数だけを返すAPI
+
+`action=query&list=footprintcounts&fpcnamespace=0` は、閲覧記録のあるページの
+累計を `pageid`・`ns`・`title`・`readers`（人数）・`views`（回数）で返します。
+読者の名前・利用者ID・個人ごとの閲覧日時は含みません。
+
+- `fpcpage=<ページ名>`：現存する1ページの集計。閲覧記録が無くても0を返します。
+  省略時は `fpcnamespace`（既定 `0`）で名前空間を選びます。
+- `fpcexcludegroups=bot|sysop`：現在これらのグループに所属する読者を除外します。
+  既定では記録済みの読者を除外しません。
+- `fpclimit`：1回の件数（既定 `50`、最大 `500`）。応答の `continue` を次の要求に
+  渡すと続きが取れます。人数順ではなくページID順です。
+
+導入以来の累計で、期間による絞り込みはありません。人数は各ページ内で重複を除くので、
+ページごとの人数の合計はWiki全体の閲覧人数にはなりません。APIの読み取りでは足跡を
+記録しません。Wikiと各ページの閲覧権限を確認し、キャッシュはprivateです。
 
 ## インストール
 
@@ -119,7 +137,7 @@ $wgFootprintsDialogFontStylesheets = [
 分けてください。複数ファミリーをまとめた URL は、最初の1つしか残りません。
 
 Special:Footprints と API は、`read` 権限があれば誰でも使えます。特定のグループに
-限りたい場合は、`SpecialFootprints::execute()` と `ApiQueryFootprints::execute()` に
+限りたい場合は、`SpecialFootprints::execute()` と `ApiQueryFootprints::execute()`・`ApiQueryFootprintCounts::execute()` に
 権限の確認を足してください。
 
 ## 拡張する

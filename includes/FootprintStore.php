@@ -238,6 +238,27 @@ class FootprintStore {
 			->fetchResultSet();
 	}
 
+	public function getAggregateCounts( ?int $pageId, int $namespace, array $excludeGroups,
+		int $afterId, int $limit
+	): IResultWrapper {
+		$dbr = $this->dbProvider->getReplicaDatabase();
+		$query = $dbr->newSelectQueryBuilder()
+			->select( [ 'page_id', 'page_namespace', 'page_title',
+				'readers' => 'COUNT(*)', 'views' => 'SUM(fp_views)' ] )
+			->from( self::TABLE )
+			->join( 'page', null, 'page_id = fp_page' )
+			->where( $pageId !== null ? [ 'page_id' => $pageId ] : [ 'page_namespace' => $namespace ] )
+			->andWhere( $dbr->expr( 'page_id', '>', $afterId ) );
+		if ( $excludeGroups ) {
+			$excluded = $dbr->newSelectQueryBuilder()->select( 'ug_user' )->from( 'user_groups' )
+				->where( [ 'ug_group' => $excludeGroups ] )->getSQL();
+			$query->andWhere( 'fp_user NOT IN (' . $excluded . ')' );
+		}
+		return $query->groupBy( [ 'page_id', 'page_namespace', 'page_title' ] )
+			->orderBy( 'page_id', SelectQueryBuilder::SORT_ASC )->limit( $limit )
+			->caller( __METHOD__ )->fetchResultSet();
+	}
+
 	/**
 	 * View counts for one page, one bucket per day, oldest first, zero-filled.
 	 *

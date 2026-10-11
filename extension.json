@@ -1,6 +1,6 @@
 {
 	"name": "Footprints",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"author": [
 		"dk-butsuri"
 	],
@@ -45,6 +45,13 @@
 				"TitleFactory",
 				"MainConfig",
 				"RevisionStore"
+			]
+		},
+		"footprintcounts": {
+			"class": "MediaWiki\\Extension\\Footprints\\ApiQueryFootprintCounts",
+			"services": [
+				"Footprints.FootprintStore",
+				"TitleFactory"
 			]
 		}
 	},

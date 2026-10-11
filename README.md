@@ -36,7 +36,28 @@ that is more than your wiki wants.
   with one, everyone who read it.
 - **Echo notification** (if Echo is installed): the page creator is told when
   their page reaches 1, 3, 5, 10, 20, 50 and 100 readers.
-- **API**: `action=query&list=footprints&fppage=<title>`.
+- **API**: `action=query&list=footprints&fppage=<title>` for the reader list;
+  `action=query&list=footprintcounts` for counts without reader identities.
+
+## Counts-only API
+
+`action=query&list=footprintcounts&fpcnamespace=0` returns cumulative
+`pageid`, `ns`, `title`, `readers` and `views` for pages with recorded views.
+It returns no reader names, user IDs or per-reader timestamps.
+
+- `fpcpage=<title>` returns one existing page, including zero counts when it
+  has no recorded views. Without it, `fpcnamespace` selects a namespace
+  (default `0`).
+- `fpcexcludegroups=bot|sysop` optionally excludes readers currently belonging
+  to any listed group. The default excludes no groups from recorded data.
+- `fpclimit` selects the batch size (default `50`, maximum `500`). Pass the
+  response's `continue` parameters to retrieve the next batch; results are
+  ordered by page ID, not popularity.
+
+Counts start when the extension is installed and have no date filter.
+Readers are distinct within each page, so adding page counts does not give
+an overall unique audience. Reading this API leaves no footprint. Wiki and
+page read permissions apply, and responses use private caching.
 
 ## Installation
 
@@ -123,7 +144,7 @@ that rewrite keeps only the first family of a multi-family URL.
 
 Special:Footprints and the API are open to anyone with the `read` right. To
 limit them to some group, add a check in `SpecialFootprints::execute()` and
-`ApiQueryFootprints::execute()`.
+`ApiQueryFootprints::execute()` and `ApiQueryFootprintCounts::execute()`.
 
 ## Extending
 
