@@ -1,6 +1,6 @@
 {
 	"name": "Footprints",
-	"version": "1.2.0",
+	"version": "1.3.0",
 	"author": [
 		"dk-butsuri"
 	],
@@ -94,13 +94,15 @@
 		},
 		"ext.footprints.simple": {
 			"packageFiles": [
-				"ext.footprints.simple.js"
+				"ext.footprints.simple.js",
+				"ext.footprints.live.js"
 			],
 			"dependencies": [
 				"mediawiki.util",
 				"mediawiki.language"
 			],
 			"messages": [
+				"footprints-indicator-tooltip",
 				"footprints-page-title",
 				"footprints-readercount",
 				"footprints-empty",
@@ -113,6 +115,7 @@
 		"ext.footprints.rich": {
 			"packageFiles": [
 				"ext.footprints.rich.js",
+				"ext.footprints.live.js",
 				{
 					"name": "config.json",
 					"config": [
@@ -130,6 +133,7 @@
 				"mediawiki.language"
 			],
 			"messages": [
+				"footprints-indicator-tooltip",
 				"footprints-page-title",
 				"footprints-readercount",
 				"footprints-empty",

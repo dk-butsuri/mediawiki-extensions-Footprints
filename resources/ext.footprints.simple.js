@@ -7,6 +7,7 @@
 ( function () {
 	'use strict';
 
+	var live = require( './ext.footprints.live.js' );
 	var userNsPrefix = mw.config.get( 'wgFormattedNamespaces' )[ 2 ] + ':';
 
 	function formatDate( iso ) {
@@ -66,6 +67,21 @@
 		return $content;
 	}
 
+	function fetchFootprints() {
+		return mw.loader.using( 'mediawiki.api' ).then( function () {
+			return new mw.Api().get( {
+				action: 'query',
+				list: 'footprints',
+				fppage: mw.config.get( 'wgPageName' ),
+				formatversion: 2
+			} );
+		} ).then( function ( response ) {
+			var data = response.query.footprints;
+			live.updateIndicator( data );
+			return data;
+		} );
+	}
+
 	$( function () {
 		var $indicator = $( '.ext-footprints-indicator' );
 		if ( !$indicator.length ) {
@@ -87,16 +103,8 @@
 			}
 			$link.data( 'footprintsBusy', true );
 
-			mw.loader.using( [ 'oojs-ui-windows', 'mediawiki.api' ] ).then( function () {
-				return new mw.Api().get( {
-					action: 'query',
-					list: 'footprints',
-					fppage: mw.config.get( 'wgPageName' ),
-					formatversion: 2
-				} );
-			} ).then( function ( response ) {
+			mw.loader.using( 'oojs-ui-windows' ).then( fetchFootprints ).then( function ( data ) {
 				try {
-					var data = response.query.footprints;
 					OO.ui.alert( buildContent( data, href ), {
 						title: mw.msg( 'footprints-page-title', data.title ),
 						size: 'medium'
@@ -111,5 +119,7 @@
 				$link.removeData( 'footprintsBusy' );
 			} );
 		} );
+
+		live.onRefresh( fetchFootprints );
 	} );
 }() );

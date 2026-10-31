@@ -199,6 +199,7 @@ class Hooks implements BeforePageDisplayHook, PageDeleteCompleteHook {
 		$link = Html::rawElement( 'a', [
 			'href' => $target->getLocalURL(),
 			'class' => 'ext-footprints-indicator',
+			'data-count' => $count,
 			'title' => $out->msg( 'footprints-indicator-tooltip' )->numParams( $count )->text(),
 		],
 			Html::element( 'span', [ 'class' => 'ext-footprints-icon' ] ) .

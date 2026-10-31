@@ -12,6 +12,7 @@
 	'use strict';
 
 	var config = require( './config.json' );
+	var live = require( './ext.footprints.live.js' );
 	var userNsPrefix = mw.config.get( 'wgFormattedNamespaces' )[ 2 ] + ':';
 
 	// How many rows the dialog itself shows before handing off to
@@ -335,7 +336,9 @@
 		return $tabs;
 	}
 
-	function buildContent( data, href ) {
+	// view.sort survives a refresh, so a live update doesn't throw the reader
+	// back to the first tab.
+	function buildContent( data, href, view ) {
 		var $content = $( '<div>' ).addClass( 'ext-footprints-body' );
 
 		if ( !data.count ) {
@@ -343,17 +346,16 @@
 			return $content;
 		}
 
-		var sort = 'recent';
 		var $listHolder = $( '<div>' );
 
 		function render() {
-			$listHolder.empty().append( buildList( data.viewers, sort ) );
+			$listHolder.empty().append( buildList( data.viewers, view.sort ) );
 		}
 
 		var $tabsHolder = $( '<div>' );
 		function renderTabs() {
-			$tabsHolder.empty().append( buildTabs( data, sort, function ( next ) {
-				sort = next;
+			$tabsHolder.empty().append( buildTabs( data, view.sort, function ( next ) {
+				view.sort = next;
 				render();
 				renderTabs();
 			} ) );
@@ -410,12 +412,19 @@
 
 	// Cached by page name so a hover/focus that already warmed the request
 	// isn't repeated when the click follows it, and concurrent callers share
-	// one in-flight request instead of firing one each.
+	// one in-flight request instead of firing one each. Kept only briefly:
+	// reopening the dialog a while later should show who has come since.
+	var CACHE_MS = 30000;
 	var prefetchCache = {};
 
 	function fetchFootprints( page ) {
-		if ( !prefetchCache[ page ] ) {
-			prefetchCache[ page ] = mw.loader.using( 'mediawiki.api' ).then( function () {
+		var cached = prefetchCache[ page ];
+		if ( cached && Date.now() - cached.at > CACHE_MS && cached.promise.state() !== 'pending' ) {
+			cached = null;
+		}
+		if ( !cached ) {
+			cached = prefetchCache[ page ] = { at: Date.now() };
+			cached.promise = mw.loader.using( 'mediawiki.api' ).then( function () {
 				return new mw.Api().get( {
 					action: 'query',
 					list: 'footprints',
@@ -423,15 +432,22 @@
 					formatversion: 2
 				} );
 			} ).then( function ( response ) {
-				return response.query.footprints;
+				var data = response.query.footprints;
+				live.updateIndicator( data );
+				return data;
 			} );
 			// A failed fetch shouldn't poison later attempts on the same page.
-			prefetchCache[ page ].fail( function () {
-				delete prefetchCache[ page ];
+			cached.promise.fail( function () {
+				if ( prefetchCache[ page ] === cached ) {
+					delete prefetchCache[ page ];
+				}
 			} );
 		}
-		return prefetchCache[ page ];
+		return cached.promise;
 	}
+
+	// Set while the dialog is open, to re-render it in place on a refresh.
+	var openView = null;
 
 	// Opens immediately with a loading skeleton -- the fetch may already be
 	// in flight (warmed on hover/focus) or may only start now, but either way
@@ -451,8 +467,13 @@
 			.addClass( 'ext-footprints-close' )
 			.text( mw.msg( 'footprints-dialog-close' ) );
 
+		var view = { sort: 'recent', render: render };
+
 		function close() {
 			closed = true;
+			if ( openView === view ) {
+				openView = null;
+			}
 			$overlay.remove();
 			$( document ).off( 'keydown.extFootprints' );
 			$returnFocus.trigger( 'focus' );
@@ -495,15 +516,24 @@
 		$( document.body ).append( $overlay );
 		$closeBtn.trigger( 'focus' );
 
-		promise.then( function ( data ) {
+		function render( data ) {
 			if ( closed ) {
 				return;
 			}
 			$title.text( mw.msg( 'footprints-page-title', data.title ) );
 			$dialog.attr( 'aria-label', mw.msg( 'footprints-page-title', data.title ) );
 			$subtitle.html( markNumbers( mw.msg( 'footprints-dialog-subtitle', data.count, data.totalViews ) ) );
+			var scrollTop = $body[ 0 ].scrollTop;
+			var $next = buildContent( data, href, view );
+			$body.replaceWith( $next );
+			$body = $next;
+			$body[ 0 ].scrollTop = scrollTop;
+		}
+		openView = view;
+
+		promise.then( function ( data ) {
 			try {
-				$body.replaceWith( buildContent( data, href ) );
+				render( data );
 			} catch ( err ) {
 				close();
 				window.location.href = href;
@@ -538,6 +568,18 @@
 			e.preventDefault();
 
 			openDialog( $( this ).attr( 'href' ), fetchFootprints( mw.config.get( 'wgPageName' ) ) );
+		} );
+
+		live.onRefresh( function () {
+			var page = mw.config.get( 'wgPageName' );
+			delete prefetchCache[ page ];
+			fetchFootprints( page ).then( function ( data ) {
+				if ( openView ) {
+					try {
+						openView.render( data );
+					} catch ( err ) {}
+				}
+			} );
 		} );
 	} );
 }() );

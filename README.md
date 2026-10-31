@@ -154,6 +154,13 @@ limit them to some group, add a check in `SpecialFootprints::execute()` and
   `$before` is placed inside the indicator, left of the footprint link.
 - JS hook `ext.footprints.dialog.footer` (rich dialog): receives the footer
   element; prepend a link with class `ext-footprints-footer-link`.
+- JS hook `ext.footprints.refresh` (both dialog styles): fire it, optionally
+  with the page name (`wgPageName`), when you know the page's footprints have
+  changed, e.g. from a push channel your wiki already has. The count next to
+  the title is fetched again, and so is the rich dialog if it is open.
+  Signals arriving close together cost one request, and a background tab
+  waits until it is shown. Without it, the rich dialog reuses a fetch for
+  30 seconds.
 
 ## License
 
